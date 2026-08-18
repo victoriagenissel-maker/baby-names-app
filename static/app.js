@@ -388,8 +388,7 @@ async function submitSuggestion() {
         setTimeout(() => banner.classList.add("hidden"), 1500);
     }
     alert("Suggestion sent and added to your likes.");
-    await loadHistory();
-    await loadName();
+    await Promise.all([loadHistory(), loadName()]);
 }
 
 function selectUser(user) {
@@ -470,8 +469,8 @@ async function like() {
     }
 
     setStoredCurrentName(currentUser, null);
-    await loadHistory();
     await loadName();
+    void loadHistory();
 }
 
 async function dislike() {
@@ -490,8 +489,8 @@ async function dislike() {
     });
 
     setStoredCurrentName(currentUser, null);
-    await loadHistory();
     await loadName();
+    void loadHistory();
 }
 
 async function moveNameToLike(name) {
@@ -517,8 +516,8 @@ async function moveNameToLike(name) {
         setTimeout(() => banner.classList.add("hidden"), 1500);
     }
 
-    await loadHistory();
     await loadName();
+    void loadHistory();
 }
 
 async function moveNameToDislike(name) {
@@ -538,8 +537,8 @@ async function moveNameToDislike(name) {
         return;
     }
 
-    await loadHistory();
     await loadName();
+    void loadHistory();
 }
 
 function renderNameList(elementId, items, emptyText, mode = "plain") {
