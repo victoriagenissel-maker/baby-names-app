@@ -174,27 +174,27 @@ def init_db():
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS likes (
-                    user TEXT NOT NULL,
+                    "user" TEXT NOT NULL,
                     name TEXT NOT NULL,
                     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (user, name)
+                    PRIMARY KEY ("user", name)
                 )
                 """
             )
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS dislikes (
-                    user TEXT NOT NULL,
+                    "user" TEXT NOT NULL,
                     name TEXT NOT NULL,
                     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (user, name)
+                    PRIMARY KEY ("user", name)
                 )
                 """
             )
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS users (
-                    user TEXT PRIMARY KEY,
+                    "user" TEXT PRIMARY KEY,
                     display_name TEXT NOT NULL
                 )
                 """
@@ -213,36 +213,36 @@ def init_db():
                 """
             )
             conn.execute(
-                "INSERT INTO users (user, display_name) VALUES ('user1', 'user1') ON CONFLICT (user) DO NOTHING"
+                "INSERT INTO users (\"user\", display_name) VALUES ('user1', 'user1') ON CONFLICT (\"user\") DO NOTHING"
             )
             conn.execute(
-                "INSERT INTO users (user, display_name) VALUES ('user2', 'user2') ON CONFLICT (user) DO NOTHING"
+                "INSERT INTO users (\"user\", display_name) VALUES ('user2', 'user2') ON CONFLICT (\"user\") DO NOTHING"
             )
         else:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS likes (
-                    user TEXT NOT NULL,
+                    "user" TEXT NOT NULL,
                     name TEXT NOT NULL,
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (user, name)
+                    PRIMARY KEY ("user", name)
                 )
                 """
             )
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS dislikes (
-                    user TEXT NOT NULL,
+                    "user" TEXT NOT NULL,
                     name TEXT NOT NULL,
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (user, name)
+                    PRIMARY KEY ("user", name)
                 )
                 """
             )
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS users (
-                    user TEXT PRIMARY KEY,
+                    "user" TEXT PRIMARY KEY,
                     display_name TEXT NOT NULL
                 )
                 """
@@ -261,10 +261,10 @@ def init_db():
                 """
             )
             conn.execute(
-                "INSERT OR IGNORE INTO users (user, display_name) VALUES ('user1', 'user1')"
+                "INSERT OR IGNORE INTO users (\"user\", display_name) VALUES ('user1', 'user1')"
             )
             conn.execute(
-                "INSERT OR IGNORE INTO users (user, display_name) VALUES ('user2', 'user2')"
+                "INSERT OR IGNORE INTO users (\"user\", display_name) VALUES ('user2', 'user2')"
             )
         conn.commit()
 
@@ -277,7 +277,7 @@ def ensure_user(user: str):
 def get_user_display_names():
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT user, display_name FROM users WHERE user IN ('user1', 'user2')"
+            "SELECT \"user\", display_name FROM users WHERE \"user\" IN ('user1', 'user2')"
         ).fetchall()
     labels = {"user1": "user1", "user2": "user2"}
     for row in rows:
@@ -372,14 +372,14 @@ def create_suggestion(payload: dict):
         )
         if IS_POSTGRES:
             conn.execute(
-                "INSERT INTO likes (user, name) VALUES (?, ?) ON CONFLICT (user, name) DO NOTHING",
+                "INSERT INTO likes (\"user\", name) VALUES (?, ?) ON CONFLICT (\"user\", name) DO NOTHING",
                 (from_user, name),
             )
         else:
-            conn.execute("INSERT OR IGNORE INTO likes (user, name) VALUES (?, ?)", (from_user, name))
-        conn.execute("DELETE FROM dislikes WHERE user = ? AND name = ?", (from_user, name))
+            conn.execute("INSERT OR IGNORE INTO likes (\"user\", name) VALUES (?, ?)", (from_user, name))
+        conn.execute("DELETE FROM dislikes WHERE \"user\" = ? AND name = ?", (from_user, name))
         other_like = conn.execute(
-            "SELECT 1 FROM likes WHERE user = ? AND name = ?",
+            "SELECT 1 FROM likes WHERE \"user\" = ? AND name = ?",
             (to_user, name),
         ).fetchone()
         conn.commit()
@@ -444,11 +444,11 @@ def update_users(payload: dict):
 
     with get_conn() as conn:
         conn.execute(
-            "INSERT INTO users (user, display_name) VALUES ('user1', ?) ON CONFLICT(user) DO UPDATE SET display_name = excluded.display_name",
+            "INSERT INTO users (\"user\", display_name) VALUES ('user1', ?) ON CONFLICT(\"user\") DO UPDATE SET display_name = excluded.display_name",
             (user1_name,),
         )
         conn.execute(
-            "INSERT INTO users (user, display_name) VALUES ('user2', ?) ON CONFLICT(user) DO UPDATE SET display_name = excluded.display_name",
+            "INSERT INTO users (\"user\", display_name) VALUES ('user2', ?) ON CONFLICT(\"user\") DO UPDATE SET display_name = excluded.display_name",
             (user2_name,),
         )
         conn.commit()
@@ -485,9 +485,9 @@ def next_name(user: str, cursor: int = 0, genders: str | None = None, origins: s
     with get_conn() as conn:
         rows = conn.execute(
             """
-            SELECT name FROM likes WHERE user = ?
+            SELECT name FROM likes WHERE "user" = ?
             UNION
-            SELECT name FROM dislikes WHERE user = ?
+            SELECT name FROM dislikes WHERE "user" = ?
             """,
             (user, user),
         ).fetchall()
@@ -532,14 +532,14 @@ def like(payload: dict):
     with get_conn() as conn:
         if IS_POSTGRES:
             conn.execute(
-                "INSERT INTO likes (user, name) VALUES (?, ?) ON CONFLICT (user, name) DO NOTHING",
+                "INSERT INTO likes (\"user\", name) VALUES (?, ?) ON CONFLICT (\"user\", name) DO NOTHING",
                 (user, name),
             )
         else:
-            conn.execute("INSERT OR IGNORE INTO likes (user, name) VALUES (?, ?)", (user, name))
-        conn.execute("DELETE FROM dislikes WHERE user = ? AND name = ?", (user, name))
+            conn.execute("INSERT OR IGNORE INTO likes (\"user\", name) VALUES (?, ?)", (user, name))
+        conn.execute("DELETE FROM dislikes WHERE \"user\" = ? AND name = ?", (user, name))
         other_like = conn.execute(
-            "SELECT 1 FROM likes WHERE user = ? AND name = ?",
+            "SELECT 1 FROM likes WHERE \"user\" = ? AND name = ?",
             (other, name),
         ).fetchone()
         conn.commit()
@@ -563,12 +563,12 @@ def dislike(payload: dict):
     with get_conn() as conn:
         if IS_POSTGRES:
             conn.execute(
-                "INSERT INTO dislikes (user, name) VALUES (?, ?) ON CONFLICT (user, name) DO NOTHING",
+                "INSERT INTO dislikes (\"user\", name) VALUES (?, ?) ON CONFLICT (\"user\", name) DO NOTHING",
                 (user, name),
             )
         else:
-            conn.execute("INSERT OR IGNORE INTO dislikes (user, name) VALUES (?, ?)", (user, name))
-        conn.execute("DELETE FROM likes WHERE user = ? AND name = ?", (user, name))
+            conn.execute("INSERT OR IGNORE INTO dislikes (\"user\", name) VALUES (?, ?)", (user, name))
+        conn.execute("DELETE FROM likes WHERE \"user\" = ? AND name = ?", (user, name))
         conn.commit()
 
     return {"status": "ok"}
@@ -586,7 +586,7 @@ def get_likes(user: str, genders: str | None = None, origins: str | None = None)
 
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT name FROM likes WHERE user = ? ORDER BY created_at DESC",
+            "SELECT name FROM likes WHERE \"user\" = ? ORDER BY created_at DESC",
             (user,),
         ).fetchall()
     names = [row["name"] for row in rows]
@@ -606,7 +606,7 @@ def get_dislikes(user: str, genders: str | None = None, origins: str | None = No
 
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT name FROM dislikes WHERE user = ? ORDER BY created_at DESC",
+            "SELECT name FROM dislikes WHERE \"user\" = ? ORDER BY created_at DESC",
             (user,),
         ).fetchall()
     names = [row["name"] for row in rows]
@@ -631,7 +631,7 @@ def get_matches(user: str | None = None, genders: str | None = None, origins: st
             SELECT l1.name
             FROM likes l1
             JOIN likes l2 ON l1.name = l2.name
-            WHERE l1.user = 'user1' AND l2.user = 'user2'
+            WHERE l1."user" = 'user1' AND l2."user" = 'user2'
             ORDER BY lower(l1.name)
             """
         ).fetchall()
@@ -652,11 +652,11 @@ def get_history(user: str, genders: str | None = None, origins: str | None = Non
 
     with get_conn() as conn:
         likes_rows = conn.execute(
-            "SELECT name FROM likes WHERE user = ? ORDER BY created_at DESC",
+            "SELECT name FROM likes WHERE \"user\" = ? ORDER BY created_at DESC",
             (user,),
         ).fetchall()
         dislikes_rows = conn.execute(
-            "SELECT name FROM dislikes WHERE user = ? ORDER BY created_at DESC",
+            "SELECT name FROM dislikes WHERE \"user\" = ? ORDER BY created_at DESC",
             (user,),
         ).fetchall()
         match_rows = conn.execute(
@@ -664,7 +664,7 @@ def get_history(user: str, genders: str | None = None, origins: str | None = Non
             SELECT l1.name
             FROM likes l1
             JOIN likes l2 ON l1.name = l2.name
-            WHERE l1.user = 'user1' AND l2.user = 'user2'
+            WHERE l1."user" = 'user1' AND l2."user" = 'user2'
             ORDER BY lower(l1.name)
             """
         ).fetchall()
