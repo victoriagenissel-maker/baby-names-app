@@ -33,6 +33,10 @@ function userCursorKey(user) {
     return `baby_cursor_${user}`;
 }
 
+function currentNameKey(user) {
+    return `baby_current_name_${user}`;
+}
+
 function getStoredCursor(user) {
     const raw = localStorage.getItem(userCursorKey(user));
     return raw ? parseInt(raw, 10) : 0;
@@ -40,6 +44,18 @@ function getStoredCursor(user) {
 
 function setStoredCursor(user, value) {
     localStorage.setItem(userCursorKey(user), String(value));
+}
+
+function getStoredCurrentName(user) {
+    return localStorage.getItem(currentNameKey(user));
+}
+
+function setStoredCurrentName(user, value) {
+    if (value) {
+        localStorage.setItem(currentNameKey(user), value);
+    } else {
+        localStorage.removeItem(currentNameKey(user));
+    }
 }
 
 function getCheckedValues(groupName) {
@@ -405,6 +421,13 @@ async function loadName() {
         return;
     }
 
+    const storedCurrentName = getStoredCurrentName(currentUser);
+    if (storedCurrentName) {
+        currentName = storedCurrentName;
+        document.getElementById("card").innerText = storedCurrentName;
+        return;
+    }
+
     const params = buildFilteredParams("swipe", true);
 
     let res = await fetch(`/next?${params.toString()}`);
@@ -413,14 +436,15 @@ async function loadName() {
     if (data.done) {
         document.getElementById("card").innerText = "No more names";
         currentName = null;
+        setStoredCurrentName(currentUser, null);
         return;
     }
 
-    index = (data.index ?? index) + 1;
-    setStoredCursor(currentUser, index);
-    currentName = data.name;
-    document.getElementById("card").innerText =
-        `${data.name} (${data.gender}, ${data.origin})`;
+    index = data.index ?? index;
+    setStoredCursor(currentUser, index + 1);
+    currentName = `${data.name} (${data.gender}, ${data.origin})`;
+    setStoredCurrentName(currentUser, currentName);
+    document.getElementById("card").innerText = currentName;
 }
 
 async function like() {
@@ -428,12 +452,13 @@ async function like() {
         return;
     }
 
+    const visibleName = currentName.split(" (")[0];
     const res = await fetch("/like", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             user: currentUser,
-            name: currentName
+            name: visibleName
         })
     });
     const data = await res.json();
@@ -444,6 +469,7 @@ async function like() {
         setTimeout(() => banner.classList.add("hidden"), 1500);
     }
 
+    setStoredCurrentName(currentUser, null);
     await loadHistory();
     await loadName();
 }
@@ -453,15 +479,17 @@ async function dislike() {
         return;
     }
 
+    const visibleName = currentName.split(" (")[0];
     await fetch("/dislike", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             user: currentUser,
-            name: currentName
+            name: visibleName
         })
     });
 
+    setStoredCurrentName(currentUser, null);
     await loadHistory();
     await loadName();
 }
