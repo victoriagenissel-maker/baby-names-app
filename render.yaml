@@ -1,0 +1,20 @@
+databases:
+  - name: baby-names-db
+    databaseName: baby_names
+    user: baby_names_user
+    plan: free
+
+services:
+  - type: web
+    name: baby-names-app
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: baby-names-db
+          property: connectionString
+      - key: BABY_NAMES_DB_PATH
+        value: /tmp/baby_names.db

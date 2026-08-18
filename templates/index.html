@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f766e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Baby Names">
+    <title>Baby Names</title>
+    <link rel="manifest" href="/manifest.json?v=7">
+    <link rel="apple-touch-icon" href="/static/pwa/icon.svg?v=7">
+    <link rel="icon" type="image/svg+xml" href="/static/pwa/icon.svg?v=7">
+    <link rel="stylesheet" href="/static/style.css?v=7">
+</head>
+
+<body>
+
+<h1>Baby Name Picker</h1>
+
+<div id="login" class="panel">
+    <p>Who are you?</p>
+    <div class="buttons">
+        <button id="login-user1-btn" onclick="selectUser('user1')">I am user1</button>
+        <button id="login-user2-btn" onclick="selectUser('user2')">I am user2</button>
+    </div>
+</div>
+
+<div id="app" class="hidden">
+    <div class="session-row app-header-row">
+        <p id="whoami"></p>
+        <div class="buttons small-buttons inline-buttons">
+            <button type="button" onclick="showPage('swipe')">Swipe</button>
+            <button type="button" onclick="showPage('settings')">Settings</button>
+            <button type="button" onclick="showPage('lists')">Lists</button>
+        </div>
+    </div>
+
+    <div id="swipe-page">
+        <div id="card">
+            Loading...
+        </div>
+
+        <div class="buttons">
+            <button onclick="dislike()">❌ Nope</button>
+            <button onclick="like()">❤️ Like</button>
+        </div>
+
+        <p id="match-banner" class="hidden">Its a match!</p>
+    </div>
+
+    <div id="settings-page" class="hidden">
+        <div id="user-settings" class="panel">
+            <h3>User Names</h3>
+            <div class="name-fields">
+                <label>
+                    User 1
+                    <input id="user1-name" type="text" maxlength="60" placeholder="Your name">
+                </label>
+                <label>
+                    User 2
+                    <input id="user2-name" type="text" maxlength="60" placeholder="Partner name">
+                </label>
+            </div>
+            <div class="buttons small-buttons">
+                <button type="button" onclick="saveUserNames()">Save names</button>
+                <button type="button" onclick="switchUser()">Switch user</button>
+                <button type="button" onclick="resetAllData()">Restart from scratch</button>
+            </div>
+            <p id="settings-status" class="status-text"></p>
+        </div>
+
+        <div id="swipe-filters" class="panel filters-panel">
+            <h3>Swipe Filters</h3>
+
+            <div class="filter-group">
+                <p>Gender</p>
+                <div class="filter-actions">
+                    <button type="button" onclick="setGroupChecked('swipe', 'gender', true)">All</button>
+                    <button type="button" onclick="setGroupChecked('swipe', 'gender', false)">None</button>
+                </div>
+                <div id="swipe-gender-options" class="options"></div>
+            </div>
+
+            <div class="filter-group">
+                <p>Origin</p>
+                <div class="filter-actions">
+                    <button type="button" onclick="setGroupChecked('swipe', 'origin', true)">All</button>
+                    <button type="button" onclick="setGroupChecked('swipe', 'origin', false)">None</button>
+                </div>
+                <div id="swipe-origin-options" class="options"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lists-page" class="hidden">
+        <div id="print-controls" class="panel">
+            <h3>Print Options</h3>
+            <div class="print-options">
+                <label><input id="print-liked" type="checkbox" checked> Include liked</label>
+                <label><input id="print-disliked" type="checkbox"> Include disliked</label>
+                <label><input id="print-matched" type="checkbox" checked> Include matched</label>
+                <label><input id="print-suggested" type="checkbox" checked> Include suggested</label>
+            </div>
+            <div class="buttons small-buttons">
+                <button type="button" onclick="printSelectedLists()">Print selected lists</button>
+            </div>
+        </div>
+
+        <div id="list-filters" class="panel filters-panel">
+            <h3>List Filters</h3>
+
+            <div class="filter-group">
+                <p>Gender</p>
+                <div class="filter-actions">
+                    <button type="button" onclick="setGroupChecked('list', 'gender', true)">All</button>
+                    <button type="button" onclick="setGroupChecked('list', 'gender', false)">None</button>
+                </div>
+                <div id="list-gender-options" class="options"></div>
+            </div>
+
+            <div class="filter-group">
+                <p>Origin</p>
+                <div class="filter-actions">
+                    <button type="button" onclick="setGroupChecked('list', 'origin', true)">All</button>
+                    <button type="button" onclick="setGroupChecked('list', 'origin', false)">None</button>
+                </div>
+                <div id="list-origin-options" class="options"></div>
+            </div>
+        </div>
+
+        <div id="manual-suggestion" class="panel">
+            <h3>Suggest a Manual Name</h3>
+            <div class="name-fields">
+                <label>
+                    Name
+                    <input id="suggest-name" type="text" maxlength="80" placeholder="Enter name">
+                </label>
+                <label>
+                    Gender
+                    <select id="suggest-gender">
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                    </select>
+                </label>
+                <label>
+                    Origin
+                    <input id="suggest-origin" type="text" maxlength="60" placeholder="Enter origin">
+                </label>
+            </div>
+            <div class="buttons small-buttons">
+                <button type="button" onclick="submitSuggestion()">Send suggestion</button>
+            </div>
+        </div>
+
+        <div class="lists-grid">
+            <div id="card-liked" class="list-card">
+                <h3>Liked by me</h3>
+                <ul id="likes-list"></ul>
+            </div>
+
+            <div id="card-disliked" class="list-card">
+                <h3>Disliked by me</h3>
+                <ul id="dislikes-list"></ul>
+            </div>
+
+            <div id="card-matched" class="list-card">
+                <h3>Matched with other user</h3>
+                <ul id="matches-list"></ul>
+            </div>
+
+            <div id="card-suggested" class="list-card">
+                <h3>Suggested to me</h3>
+                <ul id="suggestions-list"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/app.js?v=7"></script>
+</body>
+</html>

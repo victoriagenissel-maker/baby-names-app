@@ -1,0 +1,234 @@
+body {
+    font-family: Arial;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.panel {
+    margin: 20px auto;
+}
+
+.hidden {
+    display: none;
+}
+
+#card {
+    font-size: 32px;
+    padding: 40px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    width: 300px;
+    margin: auto;
+}
+
+.buttons {
+    margin-top: 20px;
+}
+
+button {
+    font-size: 20px;
+    margin: 10px;
+    padding: 10px 20px;
+}
+
+#whoami {
+    font-weight: bold;
+}
+
+#match-banner {
+    color: #0a7f34;
+    font-weight: bold;
+}
+
+#matches {
+    list-style: none;
+    padding: 0;
+}
+
+#matches li {
+    margin: 6px 0;
+}
+
+.filters-panel {
+    max-width: 700px;
+    margin: 0 auto 20px;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.filter-group {
+    margin: 12px 0;
+}
+
+.filter-actions button {
+    font-size: 14px;
+    padding: 6px 12px;
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.options label {
+    border: 1px solid #d7d7d7;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.session-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.session-row button {
+    font-size: 14px;
+    padding: 6px 12px;
+}
+
+.lists-grid {
+    max-width: 960px;
+    margin: 20px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.list-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.list-card h3 {
+    margin-top: 0;
+}
+
+.list-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-card li {
+    margin: 6px 0;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.mini-action {
+    font-size: 12px;
+    padding: 4px 8px;
+    margin: 0;
+}
+
+#user-settings {
+    max-width: 760px;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.name-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 10px 0;
+}
+
+.name-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.name-fields input {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.name-fields select {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    background: #fff;
+}
+
+.small-buttons button {
+    font-size: 14px;
+    padding: 8px 14px;
+}
+
+.inline-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.app-header-row {
+    margin-bottom: 10px;
+}
+
+.status-text {
+    min-height: 20px;
+    font-size: 14px;
+    color: #0f766e;
+}
+
+.error-text {
+    color: #b91c1c;
+}
+
+.print-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.print-options label {
+    font-size: 14px;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #lists-page,
+    #lists-page * {
+        visibility: visible;
+    }
+
+    #lists-page {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    #print-controls,
+    #list-filters,
+    #manual-suggestion,
+    .app-header-row {
+        display: none !important;
+    }
+
+    .print-exclude {
+        display: none !important;
+    }
+}
